@@ -70,9 +70,36 @@ class UserClass {
 	static async getUserByIdWithRoles(id) {
 		return await this.findById(id).populate({ path: 'roles', select: 'name description createdAt updatedAt' });
 	}
+	static async getUserByEmail(email) {
+		return await this.findOne({ email });
+	}
 
 	static async getUserByUserName(userName) {
 		return await this.findOne({ userName });
+	}
+	
+	static async updateUserById(userId, body) {
+		const user = await this.getUserById(userId);
+		if (!user) {
+			throw new APIError('User not found', httpStatus.NOT_FOUND);
+		}
+		if (await this.isUserNameAlreadyExists(body.userName, userId)) {
+			throw new APIError('User name already exists', httpStatus.BAD_REQUEST);
+		}
+		if (await this.isEmailAlreadyExists(body.email, userId)) {
+			throw new APIError('Email already exists', httpStatus.BAD_REQUEST);
+		}
+		if (body.roles) {
+			await Promise.all(
+				body.roles.map(async (rid) => {
+					if (!(await Role.findById(rid))) {
+						throw new APIError('Roles not exist', httpStatus.BAD_REQUEST);
+					}
+				})
+			);
+		}
+		Object.assign(user, body);
+		return await user.save();
 	}
 
 	static async createUser(body) {

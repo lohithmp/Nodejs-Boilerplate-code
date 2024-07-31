@@ -3,6 +3,7 @@ import moment from 'moment';
 import Token from '../models/tokenModel.js';
 import jwtService from '../services/jwtService.js';
 import crypto from 'crypto';
+import User from '../models/userModel.js';
 
 export const generateAuthTokens = async (user) => {
 	const accessTokenExpires = moment().add('30', 'minutes');
@@ -32,6 +33,7 @@ export const generateRandomToken = async (length = 66) => {
 };
 
 export const verifyToken = async (token, type) => {
+	console.log("TOKEN___>", token);
 	const tokenDoc = await Token.findOne({ token, type, blacklisted: false });
 	console.log("-tokenDoc-",tokenDoc);
 	if (!tokenDoc) {
@@ -41,4 +43,15 @@ export const verifyToken = async (token, type) => {
 		throw new APIError('Token expires', httpStatus.UNAUTHORIZED);
 	}
 	return tokenDoc;
+};
+
+export const generateResetPasswordToken = async (email) => {
+	const user = await User.getUserByEmail(email);
+	if (!user) {
+		throw new APIError('No users found with this email', httpStatus.NOT_FOUND);
+	}
+	const expires = moment().add('2000', 'minutes');
+	const resetPasswordToken = await generateRandomToken();
+	await Token.saveToken(resetPasswordToken, user.id, expires, 'resetPassword');
+	return resetPasswordToken;
 };

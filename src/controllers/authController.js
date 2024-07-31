@@ -1,9 +1,10 @@
 import APIError from '../utils/apiError.js';
-import {generateAuthTokens, verifyToken } from '../services/tokenService.js';
+import { generateAuthTokens, verifyToken, generateResetPasswordToken } from '../services/tokenService.js';
 import User from '../models/userModel.js';
 import httpStatus from 'http-status';
 import Role from '../models/roleModel.js';
 import Token from '../models/tokenModel.js';
+import { sendResetPasswordEmail } from '../services/emailService/index.js';
 
 const signup = async (req, res) => {
 	const role = await Role.getRoleByName('User');
@@ -74,11 +75,40 @@ export const getMe = async (req, res) => {
 	});
 };
 
+export const forgotPassword = async (req, res) => {
+	const resetPasswordToken = await generateResetPasswordToken(req.body.email);
+	await sendResetPasswordEmail(req.body.email, resetPasswordToken);
+	return res.json({
+		success: true,
+		data: 'Send forgot password email success'
+	});
+};
+
+export const resetPassword = async (req, res) => {
+	try {
+		const resetPasswordTokenDoc = await verifyToken(req.query.token, 'resetPassword');
+		const user = await User.getUserById(resetPasswordTokenDoc.user);
+		console.log("reset password ==>", user);
+		if (!user) {
+			throw new Error();
+		}
+		await Token.deleteMany({ user: user.id, type: 'resetPassword' });
+		await User.updateUserById(user.id, { password: req.body.password });
+		return res.json({
+			success: true,
+			data: 'Reset password success'
+		});
+	} catch (err) {
+		throw new APIError('Password reset failed', httpStatus.UNAUTHORIZED);
+	}
+};
 
 export default {
 	signup,
 	signin,
 	signout,
 	refreshTokens,
-	getMe
+	getMe,
+	forgotPassword,
+	resetPassword
 };

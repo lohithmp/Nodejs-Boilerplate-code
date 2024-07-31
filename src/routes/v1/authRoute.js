@@ -11,6 +11,9 @@ router.post('/signin', authController.signin);
 router.post('/signout', validate(authValidation.signout), catchAsync(authController.signout));
 router.post('/refresh-tokens', authController.refreshTokens);
 router.get('/getUser', authenticate(), catchAsync(authController.getMe));
+router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
+
 
 
 export default router;
