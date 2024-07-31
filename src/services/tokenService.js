@@ -2,11 +2,12 @@
 import moment from 'moment';
 import Token from '../models/tokenModel.js';
 import jwtService from '../services/jwtService.js';
+import crypto from 'crypto';
 
 export const generateAuthTokens = async (user) => {
 	const accessTokenExpires = moment().add('30', 'minutes');
-	const accessToken = await jwtService.sign(user.id, accessTokenExpires, 'secret_key', {
-		algorithm: 'RS256'
+	const accessToken = await jwtService.sign(user.id, accessTokenExpires, 'your_secret_key', {
+		algorithm: 'HS256'
 	});
 
 	const refreshTokenExpires = moment().add('1', 'days');
@@ -28,4 +29,16 @@ export const generateAuthTokens = async (user) => {
 export const generateRandomToken = async (length = 66) => {
 	const random = crypto.randomBytes(length).toString('hex');
 	return random;
+};
+
+export const verifyToken = async (token, type) => {
+	const tokenDoc = await Token.findOne({ token, type, blacklisted: false });
+	console.log("-tokenDoc-",tokenDoc);
+	if (!tokenDoc) {
+		throw new APIError('Token not found', httpStatus.UNAUTHORIZED);
+	}
+	if (moment(tokenDoc.expiresAt).format() < moment().format()) {
+		throw new APIError('Token expires', httpStatus.UNAUTHORIZED);
+	}
+	return tokenDoc;
 };
