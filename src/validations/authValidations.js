@@ -37,10 +37,16 @@ export const resetPassword = {
 		password: Joi.string().trim().min(6).max(666).required()
 	})
 };
+export const refreshTokens = {
+	body: Joi.object().keys({
+		refreshToken: Joi.string().required()
+	})
+};
 
 export default {
 	signup,
 	signin,
+	refreshTokens,
 	signout,
 	forgotPassword,
 	resetPassword
