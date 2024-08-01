@@ -103,6 +103,27 @@ export const resetPassword = async (req, res) => {
 	}
 };
 
+export const updateMe = async (req, res) => {
+	console.log(req.user.id, req.body);
+	const user = await User.updateUserById(req.user.id, req.body);
+	return res.json({
+		success: true,
+		data: user
+	});
+};
+
+export const deleteMe = async (req, res) => {
+	const data =  await User.findByIdAndDelete(req.user.id);
+
+	return res.json({
+		success: true,
+		data: {
+			message: "deleted successfully!",
+			data: data
+		}
+	});
+};
+
 export default {
 	signup,
 	signin,
@@ -110,5 +131,7 @@ export default {
 	refreshTokens,
 	getMe,
 	forgotPassword,
-	resetPassword
+	resetPassword,
+	updateMe,
+	deleteMe
 };

@@ -102,6 +102,14 @@ class UserClass {
 		return await user.save();
 	}
 
+	static async deleteUserById(userId) {
+		const user = await this.getUserById(userId);
+		if (!user) {
+			throw new APIError('User not found', httpStatus.NOT_FOUND);
+		}
+		return await this.findByIdAndDelete();
+	}
+
 	static async createUser(body) {
 		if (await this.isUserNameAlreadyExists(body.userName)) {
 			throw new APIError('User name already exists', httpStatus.BAD_REQUEST);

@@ -13,6 +13,8 @@ router.post('/refresh-tokens', authController.refreshTokens);
 router.get('/getUser', authenticate(), catchAsync(authController.getMe));
 router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
+router.put('/update', authenticate(), validate(authValidation.updateMe), catchAsync(authController.updateMe));
+router.delete('/delete', authenticate(), catchAsync(authController.deleteMe));
 
 
 

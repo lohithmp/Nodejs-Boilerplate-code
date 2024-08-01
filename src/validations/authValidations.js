@@ -43,11 +43,23 @@ export const refreshTokens = {
 	})
 };
 
+export const updateMe = {
+	body: Joi.object().keys({
+		firstName: Joi.string().trim().min(2).max(66),
+		lastName: Joi.string().trim().min(2).max(66),
+		userName: Joi.string().alphanum().min(6).max(66),
+		email: Joi.string().email(),
+		password: Joi.string().trim().min(6).max(666),
+		avatar: Joi.string().max(666)
+	})
+};
+
 export default {
 	signup,
 	signin,
 	refreshTokens,
 	signout,
 	forgotPassword,
-	resetPassword
+	resetPassword,
+	updateMe
 };
