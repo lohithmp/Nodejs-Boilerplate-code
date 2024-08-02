@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import User from '../models/userModel.js';
 
 export const generateAuthTokens = async (user) => {
-	const accessTokenExpires = moment().add('30', 'minutes');
+	const accessTokenExpires = moment().add('1440', 'minutes');
 	const accessToken = await jwtService.sign(user.id, accessTokenExpires, 'your_secret_key', {
 		algorithm: 'HS256'
 	});

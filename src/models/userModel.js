@@ -64,6 +64,10 @@ class UserClass {
 		return !!(await this.findOne({ email, _id: { $ne: excludeUserId } }));
 	}
 
+	static async isRoleIdAlreadyExists(roleId, excludeUserId) {
+		return !!(await this.findOne({ roles: roleId, _id: { $ne: excludeUserId } }));
+	}
+	
 	static async getUserById(id) {
 		return await this.findById(id);
 	}

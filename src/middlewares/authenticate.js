@@ -13,16 +13,18 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
 	req.user = user;
 	if (requiredRights.length) {
 		const userRights = [];
+		console.log("user.roles:", user.roles);
 		const roles = await Role.find({ _id: { $in: user.roles } }).populate('permissions');
+		console.log({roles});
 		roles.forEach((i) => {
 			i.permissions.forEach((j) => {
 				userRights.push(`${j.controller}:${j.action}`);
 			});
 		});
 		const hasRequiredRights = requiredRights.every((r) => userRights.includes(r));
-		//console.log('requiredRights: ', requiredRights);
-		//console.log('userRights: ', userRights);
-		//console.log('boolean: ', hasRequiredRights);
+		console.log('requiredRights: ', requiredRights);
+		console.log('userRights: ', userRights);
+		console.log('boolean: ', hasRequiredRights);
 		if (!hasRequiredRights) {
 			return reject(new APIError('Resource access denied', httpStatus.FORBIDDEN));
 		}
