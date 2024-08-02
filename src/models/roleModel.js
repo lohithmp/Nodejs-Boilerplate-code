@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import APIError from '../utils/apiError.js';
-import Permission from '../models/plugins/toJsonPlugin.js';
+import paginate from './plugins/paginatePlugin.js';
+import toJSON from './plugins/toJsonPlugin.js';
+import Permission from './permissionModel.js';
 import httpStatus from 'http-status';
 
 const roleSchema = mongoose.Schema(
@@ -26,6 +28,8 @@ const roleSchema = mongoose.Schema(
 	}
 );
 
+roleSchema.plugin(toJSON);
+roleSchema.plugin(paginate);
 
 class RoleClass {
 	static async isNameAlreadyExists(name, excludeUserId) {
@@ -41,6 +45,7 @@ class RoleClass {
 	}
 
 	static async createRole(body) {
+		console.log({body});
 		if (await this.isNameAlreadyExists(body.name)) {
 			throw new APIError('Name already exists', httpStatus.BAD_REQUEST);
 		}
@@ -82,7 +87,7 @@ class RoleClass {
 		if (!role) {
 			throw new APIError('Role not found', httpStatus.NOT_FOUND);
 		}
-		return await role.remove();
+		return await this.findByIdAndDelete(roleId);
 	}
 }
 

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import toJSON from './plugins/toJSONPlugin';
+import toJSON from './plugins/toJsonPlugin.js';
 
 const permissionSchema = mongoose.Schema(
 	{
